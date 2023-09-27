@@ -96,5 +96,26 @@ namespace APIV2.Service.Repositories
                 .Include(c => c.Address)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<ICollection<User>> GetUserWalletAndTrans()
+        {
+            return await _context.Set<User>()
+                .Include(c => c.Address)
+                //.Include(c => c.UserType)
+                //.Include(s => s.Address.PostalCode)
+                .Include(w => w.Wallets)
+                .ThenInclude(wallet => wallet.Transactions)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<User>> GetUsersWithAllBettingHistory()
+        {
+            return await _context.Set<User>()
+                .Include(u => u.Wallets)
+                .ThenInclude(wallet => wallet.BettingHistories)
+                .ThenInclude(bets => bets.BettingGame)
+                .ThenInclude(betgame => betgame.Game)
+                .ToListAsync();
+        }
     }
 }

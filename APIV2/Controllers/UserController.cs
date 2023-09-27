@@ -3,6 +3,7 @@ using APIV2.Dtos.User;
 using APIV2.Models;
 using APIV2.Service.Interfaces;
 using APIV2.Service.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -115,6 +116,33 @@ namespace API.Controllers
             return Ok(user);
         }
 
+        [HttpGet("GetUsersWithAllHistory"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUsersWithAllHistory()
+        {
+            var users = await _userRepository.GetUsersWithAllBettingHistory();
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(users);
+
+        }
+
+        [HttpGet("UserWalletAndTransactions"), Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserWalletAndTrans()
+        {
+            var users = await _userRepository.GetUserWalletAndTrans();
+
+            if (users == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(users);
+        }
+
         [HttpPost("UserLogin")]
         public async Task<IActionResult> LoginUser(LoginUserDto user)
         {
@@ -145,7 +173,7 @@ namespace API.Controllers
                     login.email = userByEmail.Email;
                     login.username = userByEmail.Username;
                     login.userType1 = userByEmail.UserType.UserType1;
-                    string token = CreateToken(user.email, user.password);
+                    string token = CreateToken(user.email, userByEmail.UserType.UserType1);
                     var obj = new { login, token };
                     return Ok(obj);
                 }
@@ -157,12 +185,12 @@ namespace API.Controllers
             return BadRequest("is Bed");
         }
         
-        private string CreateToken(string email, string password)
+        private string CreateToken(string email, string userType)
         {
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, email),
-                new Claim(ClaimTypes.Role, "User")
+                new Claim(ClaimTypes.Role, userType)
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
@@ -200,17 +228,17 @@ namespace API.Controllers
         }
 
         //api/user
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetUsers()
         {
-            var useres = await _userRepository.GetAllAsync();
+            var users = await _userRepository.GetAllAsync();
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(useres);
+            return Ok(users);
         }
 
         //api/users
@@ -274,7 +302,7 @@ namespace API.Controllers
 
 
         // DELETE: api/users/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             if (!await _userRepository.entityExists(id))

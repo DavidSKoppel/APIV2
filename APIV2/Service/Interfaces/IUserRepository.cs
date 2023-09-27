@@ -13,5 +13,7 @@ namespace APIV2.Service.Interfaces
         Task PutNewUserInfo(int userId, string firstName, string lastName, string email, int phoneNumber);
         Task<User> GetUserByEmail(string email);
         Task<User> GetUserByPhoneNumber(int phoneNumber);
+        Task<ICollection<User>> GetUserWalletAndTrans();
+        Task<ICollection<User>> GetUsersWithAllBettingHistory();
     }
 }
