@@ -20,8 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\BettingGame\" />
-    <Folder Include="Dtos\BettingHistory\" />
     <Folder Include="Dtos\Character\" />
   </ItemGroup>
 

@@ -1,6 +1,7 @@
 ﻿using APIV2.Dtos.Address;
 using APIV2.Models;
 using APIV2.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -16,7 +17,7 @@ namespace APIV2.Controllers
         }
 
         // GET: api/Addresss/1
-        [HttpGet("{id}")/*, Authorize(Roles = "Admin")*/]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetAddress(int id)
         {
             if (!await _addressRepository.entityExists(id))
@@ -30,7 +31,7 @@ namespace APIV2.Controllers
         }
 
         //api/Address
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetAddresses()
         {
@@ -67,7 +68,7 @@ namespace APIV2.Controllers
         }
 
         //api/Addresss
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAddress([FromBody] Address createAddress)
         {
             if (createAddress == null)
@@ -94,7 +95,7 @@ namespace APIV2.Controllers
 
 
         //api/Addresss/id
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAddress(int id, [FromBody] Address updateAddress)
         {
             if (updateAddress == null)
@@ -129,7 +130,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/Addresss/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAddress(int id)
         {
             if (!await _addressRepository.entityExists(id))

@@ -1,5 +1,6 @@
 ﻿using APIV2.Models;
 using APIV2.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -43,7 +44,7 @@ namespace APIV2.Controllers
         }
 
         //api/characters
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCharacter([FromBody] Character createCharacter)
         {
             if (createCharacter == null)
@@ -69,7 +70,7 @@ namespace APIV2.Controllers
 
 
         //api/characters/id
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCharacter(int id, [FromBody] Character updateCharacter)
         {
             if (updateCharacter == null)
@@ -103,7 +104,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/characters/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCharacter(int id)
         {
             if (!await _characterRepository.entityExists(id))

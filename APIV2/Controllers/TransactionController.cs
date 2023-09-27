@@ -1,5 +1,6 @@
 ﻿using APIV2.Models;
 using APIV2.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -29,7 +30,7 @@ namespace APIV2.Controllers
         }
 
         // GET: api/transactions/1
-        [HttpGet("{id}")/*, Authorize(Roles = "Admin")*/]
+        [HttpGet("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetTransaction(int id)
         {
             if (!await _transactionRepository.entityExists(id))
@@ -43,7 +44,7 @@ namespace APIV2.Controllers
         }
 
         //api/transaction
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetTransactions()
         {
@@ -57,7 +58,7 @@ namespace APIV2.Controllers
         }
 
         //api/transactions
-        [HttpPost]
+        [HttpPost]//, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateTransaction([FromBody] Transaction createTransaction)
         {
             if (createTransaction == null)
@@ -83,7 +84,7 @@ namespace APIV2.Controllers
 
 
         //api/transactions/id
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTransaction(int id, [FromBody] Transaction updateTransaction)
         {
             if (updateTransaction == null)
@@ -117,7 +118,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/transactions/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
             if (!await _transactionRepository.entityExists(id))

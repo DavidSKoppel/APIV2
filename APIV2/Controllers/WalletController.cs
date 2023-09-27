@@ -1,5 +1,6 @@
 ﻿using APIV2.Models;
 using APIV2.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -30,7 +31,7 @@ namespace APIV2.Controllers
             return Ok(wallet);
         }
 
-        [HttpGet("{id}")/*, Authorize(Roles = "Admin")*/]
+        [HttpGet("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetWallet(int id)
         {
             if (!await _walletRepository.entityExists(id))
@@ -44,7 +45,7 @@ namespace APIV2.Controllers
         }
 
         //api/wallet
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetWallets()
         {
@@ -58,7 +59,7 @@ namespace APIV2.Controllers
         }
 
         //api/wallets
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateWallet([FromBody] Wallet createWallet)
         {
             if (createWallet == null)
@@ -84,7 +85,7 @@ namespace APIV2.Controllers
 
 
         //api/wallets/id
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateWallet(int id, [FromBody] Wallet updateWallet)
         {
             if (updateWallet == null)
@@ -118,7 +119,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/wallets/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteWallet(int id)
         {
             if (!await _walletRepository.entityExists(id))

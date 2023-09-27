@@ -1,5 +1,6 @@
 ﻿using APIV2.Models;
 using APIV2.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -29,7 +30,7 @@ namespace APIV2.Controllers
         }
 
         //api/userType
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetUserTypes()
         {
@@ -43,7 +44,7 @@ namespace APIV2.Controllers
         }
 
         //api/userTypes
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUserType([FromBody] UserType createUserType)
         {
             if (createUserType == null)
@@ -69,7 +70,7 @@ namespace APIV2.Controllers
 
 
         //api/userTypes/id
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateUserType(int id, [FromBody] UserType updateUserType)
         {
             if (updateUserType == null)
@@ -103,7 +104,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/userTypes/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUserType(int id)
         {
             if (!await _userTypeRepository.entityExists(id))
