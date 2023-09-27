@@ -1,6 +1,8 @@
-﻿using APIV2.Models;
+﻿using APIV2.Dtos.BettingGame;
+using APIV2.Models;
 using APIV2.Service.Interfaces;
 using APIV2.Service.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -21,12 +23,57 @@ namespace APIV2.Controllers
         [HttpGet("GetCurrentBettingGames")]
         public async Task<IActionResult> GetCurrentBettingGames()
         {
-            var users = await _bettingGameRepository.GetAllCurrentGames();
+            var games = await _bettingGameRepository.GetAllCurrentGames();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(users);
+            var playedGames = new List<GetCurrentGamesBeingPlayed>();
+            foreach (var game in games)
+            {
+                var characters = new List<CharacterDto>();
+                var bettingHistories = new List<BettingHistoryDto>();
+                foreach (var bet in game.BettingHistories)
+                {
+                    bettingHistories.Add(new BettingHistoryDto
+                    {
+                        Id = bet.Id,
+                        WalletId = bet.Id,
+                        BettingAmount = bet.BettingAmount,
+                        BettingGameId = bet.BettingGameId,
+                        BettingResult = bet.BettingResult,
+                        BettingCharacterId = bet.BettingCharacterId,
+                        Outcome = bet.Outcome
+                    });
+                }
+                foreach (var character in game.Game.Characters)
+                {
+                    characters.Add(new CharacterDto
+                    {
+                        Id = character.Id,
+                        Name = character.Name,
+                        Odds = character.Odds,
+                        GameId = character.GameId
+                    });
+                }
+                playedGames.Add(new GetCurrentGamesBeingPlayed
+                {
+                    Id = game.Id,
+                    GameId = game.GameId,
+                    WinnerId = game.WinnerId,
+                    beingPlayed = game.beingPlayed,
+                    PlannedTime = game.PlannedTime.Value.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss"),
+                    BettingHistories = bettingHistories,
+                    Game = new GameDto()
+                    {                                                                             
+                        Id = game.Game.Id,
+                        Name = game.Game.Name,
+                        Desc = game.Game.Desc,
+                        Characters = characters
+                    }
+                });
+            }
+            return Ok(playedGames);
         }
 
         [HttpGet("{id}")/*, Authorize(Roles = "Admin")*/]
@@ -43,7 +90,7 @@ namespace APIV2.Controllers
         }
 
         //api/bettingGame
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetBettingGames()
         {
@@ -117,7 +164,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/bettingGames/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBettingGame(int id)
         {
             if (!await _bettingGameRepository.entityExists(id))

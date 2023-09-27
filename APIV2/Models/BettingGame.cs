@@ -12,6 +12,7 @@ public partial class BettingGame
     public DateTime? PlannedTime { get; set; }
 
     public int? WinnerId { get; set; }
+    public bool? beingPlayed { get; set; }
 
     public virtual ICollection<BettingHistory> BettingHistories { get; set; } = new List<BettingHistory>();
 

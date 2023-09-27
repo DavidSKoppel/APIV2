@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using APIV2.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace APIV2.Data;
 
@@ -9,11 +10,13 @@ public partial class GambleonContext : DbContext
 {
     public GambleonContext()
     {
+        this.ChangeTracker.LazyLoadingEnabled = false;
     }
 
     public GambleonContext(DbContextOptions<GambleonContext> options)
         : base(options)
     {
+        this.ChangeTracker.LazyLoadingEnabled = false;
     }
 
     public virtual DbSet<Address> Addresses { get; set; }
@@ -67,6 +70,7 @@ public partial class GambleonContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("plannedTime");
             entity.Property(e => e.WinnerId).HasColumnName("winnerId");
+            entity.Property(e => e.beingPlayed).HasColumnName("beingPlayed");
 
             entity.HasOne(d => d.Game).WithMany(p => p.BettingGames)
                 .HasForeignKey(d => d.GameId)
@@ -80,6 +84,7 @@ public partial class GambleonContext : DbContext
             entity.ToTable("BettingHistory");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BettingCharacterId).HasColumnName("bettingCharacterId");
             entity.Property(e => e.BettingAmount).HasColumnName("bettingAmount");
             entity.Property(e => e.BettingGameId).HasColumnName("bettingGameId");
             entity.Property(e => e.BettingResult).HasColumnName("bettingResult");
@@ -156,7 +161,7 @@ public partial class GambleonContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Transact__3213E83F96BE294E");
 
-            entity.ToTable("Transaction");
+            entity.ToTable("Transaction", tb => tb.HasTrigger("TR_Transaction"));
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ActionTime)
@@ -174,8 +179,8 @@ public partial class GambleonContext : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__User__3213E83F4BAA6B19");
-
-            entity.ToTable("User");
+            
+            entity.ToTable("User", tb => tb.HasTrigger("TR_Wallet_for_User"));
 
             entity.HasIndex(e => e.Email, "UQ__User__AB6E61644E0E7151").IsUnique();
 

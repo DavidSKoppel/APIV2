@@ -14,8 +14,10 @@ namespace APIV2.Service.Repositories
         }
         public async Task<ICollection<BettingGame>> GetAllCurrentGames()
         {
-            return await _context.Set<BettingGame>().Where(b => b.PlannedTime > DateTime.Now)
-                .Include(e => e.Game)
+            return await _context.Set<BettingGame>().Where(b => b.PlannedTime > DateTime.Now || b.beingPlayed == true)
+                .Include(g => g.Game)
+                .ThenInclude(c => c.Characters)
+                .Include(b => b.BettingHistories)
                 //.Include(c => c.Address)
                 //.Include(s => s.Address.PostalCode)
                 .ToListAsync();
