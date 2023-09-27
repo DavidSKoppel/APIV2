@@ -1,6 +1,8 @@
-﻿using APIV2.Models;
+﻿using APIV2.Dtos.Game;
+using APIV2.Models;
 using APIV2.Service.Interfaces;
 using APIV2.Service.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -17,6 +19,33 @@ namespace APIV2.Controllers
             _gameRepository = gameRepository;
             _configuration = configuration;
         }
+        [HttpGet("Random")]
+        public async Task<IActionResult> GetRandomGame()
+        {
+            var game = await _gameRepository.GetRandomGameWithCharacters();
+            var characters = new List<CharacterDto>();
+            foreach (var character in game.Characters)
+            {
+                characters.Add(new CharacterDto
+                {
+                    Id = character.Id,
+                    Name = character.Name,
+                    Odds = character.Odds,
+                    GameId = character.GameId
+                });
+            }
+            GameDto randomGame = new GameDto() 
+            {
+                Id = game.Id,
+                Name = game.Name,
+                Characters = characters
+            }; 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return Ok(randomGame);
+        }
+
         [HttpGet("{id}")/*, Authorize(Roles = "Admin")*/]
         public async Task<IActionResult> GetGame(int id)
         {
@@ -31,7 +60,7 @@ namespace APIV2.Controllers
         }
 
         //api/game
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetGames()
         {
@@ -45,7 +74,7 @@ namespace APIV2.Controllers
         }
 
         //api/games
-        [HttpPost]
+        [HttpPost, Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateGame([FromBody] Game createGame)
         {
             if (createGame == null)
@@ -71,7 +100,7 @@ namespace APIV2.Controllers
 
 
         //api/games/id
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateGame(int id, [FromBody] Game updateGame)
         {
             if (updateGame == null)
@@ -105,7 +134,7 @@ namespace APIV2.Controllers
 
 
         // DELETE: api/games/3
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteGame(int id)
         {
             if (!await _gameRepository.entityExists(id))

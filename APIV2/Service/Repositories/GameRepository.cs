@@ -20,5 +20,17 @@ namespace APIV2.Service.Repositories
                 //.Include(s => s.Address.PostalCode)
                 .ToListAsync();
         }
+
+        public async Task<Game> GetRandomGameWithCharacters()
+        {
+            Random rng = new Random();
+            List<Game> listOfGames = _context.Games.ToList();
+
+            Game game = listOfGames[rng.Next(0, listOfGames.Count)];
+            
+            return await _context.Games.Where(c => c.Id == game.Id)
+                .Include(c => c.Characters)
+                .FirstOrDefaultAsync();
+        }
     }
 }
