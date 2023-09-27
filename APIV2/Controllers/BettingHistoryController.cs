@@ -1,5 +1,7 @@
-﻿using APIV2.Models;
+﻿using APIV2.Dtos.BettingHistory;
+using APIV2.Models;
 using APIV2.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace APIV2.Controllers
@@ -12,6 +14,49 @@ namespace APIV2.Controllers
         public BettingHistoryController(IBettingHistoryRepository bettingHistoryRepository)
         {
             _bettingHistoryRepository = bettingHistoryRepository;
+        }
+
+        [HttpGet("GetBettingHistoriesByBetGameId/{id}")]
+        public async Task<IActionResult> GetBettingHistoriesByBetGameId(int id)
+        {
+            var bettingHistory = await _bettingHistoryRepository.GetBettingHistoriesByBettingGameId(id);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (bettingHistory == null)
+                return NotFound();
+
+            var bets = new List<BettingHistoryDto>();
+            foreach(var bettings in bettingHistory)
+            {
+                bets.Add(new BettingHistoryDto
+                {
+                    Id = bettings.Id,
+                    BettingAmount = bettings.BettingAmount,
+                    BettingCharacterId = bettings.BettingCharacterId,
+                    BettingGameId = bettings.BettingGameId,
+                    BettingResult = bettings.BettingResult,
+                    Outcome = bettings.Outcome,
+                    WalletId = bettings.WalletId
+                });
+            }
+
+            return Ok(bets);
+        }
+
+        [HttpGet("GetByUserIdAndGame")/*, Authorize(Roles = "Admin")*/]
+        public async Task<IActionResult> GetBettingHistoriesByUserIdAndGameId(int userId, int betId)
+        {
+            var bettingHistory = await _bettingHistoryRepository.GetByUserIdAndBetGameId(userId, betId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (bettingHistory == null)
+                return NotFound();
+
+            return Ok(bettingHistory);
         }
 
         [HttpGet("UserId/{id}")/*, Authorize(Roles = "Admin")*/]
@@ -43,7 +88,7 @@ namespace APIV2.Controllers
         }
 
         //api/bettingHistory
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "Admin")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetBettingHistories()
         {

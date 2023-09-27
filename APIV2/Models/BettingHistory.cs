@@ -18,6 +18,7 @@ public partial class BettingHistory
     public bool? Outcome { get; set; }
 
     public double? BettingResult { get; set; }
+    public int BettingCharacterId { get; set; }
 
     public virtual BettingGame? BettingGame { get; set; }
 

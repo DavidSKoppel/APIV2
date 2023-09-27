@@ -13,11 +13,23 @@ namespace APIV2.Service.Repositories
 
         }
 
+        public async Task<ICollection<BettingHistory>> GetBettingHistoriesByBettingGameId(int betGameId)
+        {
+            return await _context.BettingHistories.Where(e => e.BettingGameId == betGameId)
+                .ToListAsync();
+        }
+
         public async Task<ICollection<BettingHistory>> GetBettingHistoriesByUserId(int userId)
         {
             return await _context.BettingHistories.Where(e => e.Wallet.UserId == userId)
                 .Include(e => e.BettingGame.Game)
                 .Include(e => e.BettingGame.Game.Name)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<BettingHistory>> GetByUserIdAndBetGameId(int userId, int betId)
+        {
+            return await _context.BettingHistories.Where(e => e.Wallet.UserId == userId && e.BettingGameId == betId)
                 .ToListAsync();
         }
     }
