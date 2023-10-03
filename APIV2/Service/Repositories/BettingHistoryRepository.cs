@@ -21,9 +21,8 @@ namespace APIV2.Service.Repositories
 
         public async Task<ICollection<BettingHistory>> GetBettingHistoriesByUserId(int userId)
         {
-            return await _context.BettingHistories.Where(e => e.Wallet.UserId == userId)
-                .Include(e => e.BettingGame.Game)
-                .Include(e => e.BettingGame.Game.Name)
+            return await _context.BettingHistories.Where(b => b.Wallet.UserId == userId)
+                .Include(e => e.BettingGame.Game.Characters)
                 .ToListAsync();
         }
 

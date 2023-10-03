@@ -36,6 +36,7 @@ namespace APIV2.Controllers
                     BettingAmount = bettings.BettingAmount,
                     BettingCharacterId = bettings.BettingCharacterId,
                     BettingGameId = bettings.BettingGameId,
+                    CreatedTime = bettings.CreatedTime,
                     BettingResult = bettings.BettingResult,
                     Outcome = bettings.Outcome,
                     WalletId = bettings.WalletId
@@ -70,7 +71,40 @@ namespace APIV2.Controllers
             if (bettingHistory == null)
                 return NotFound();
 
-            return Ok(bettingHistory);
+            var bets = new List<BettingHistoryForUserDto>();
+            foreach (var bet in bettingHistory)
+            {
+                var game = new GameForUserDto()
+                {
+                    Name = bet.BettingGame.Game.Name,
+                };
+
+                var betGame = new BettingGameForUserDto() 
+                {
+                    beingPlayed = bet.BettingGame.beingPlayed,
+                    PlannedTime = bet.BettingGame.PlannedTime,
+                    Game = game
+                };
+                try
+                {
+                    bets.Add(new BettingHistoryForUserDto()
+                    {
+                        BettingAmount = bet.BettingAmount,
+                        BettingCharacter = bet.BettingGame.Game.Characters.Where(c => c.Id == bet.BettingCharacterId).FirstOrDefault().Name,
+                        BettingGame = betGame,
+                        BettingResult = bet.BettingResult,
+                        CreatedTime = bet.CreatedTime,
+                        Id = bet.Id,
+                        Outcome = bet.Outcome
+                    });
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            }
+            return Ok(bets);
         }
 
         // GET: api/bettingHistorys/1
@@ -88,7 +122,7 @@ namespace APIV2.Controllers
         }
 
         //api/bettingHistory
-        [HttpGet, Authorize(Roles = "Admin")]
+        [HttpGet, Authorize(Roles = "Admin, Internal")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetBettingHistories()
         {
