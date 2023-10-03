@@ -41,6 +41,7 @@ namespace APIV2.Controllers
                         WalletId = bet.Id,
                         BettingAmount = bet.BettingAmount,
                         BettingGameId = bet.BettingGameId,
+                        CreatedTime = bet.CreatedTime,
                         BettingResult = bet.BettingResult,
                         BettingCharacterId = bet.BettingCharacterId,
                         Outcome = bet.Outcome
@@ -69,6 +70,7 @@ namespace APIV2.Controllers
                         Id = game.Game.Id,
                         Name = game.Game.Name,
                         Desc = game.Game.Desc,
+                        GameImage = game.Game.GameImage,
                         Characters = characters
                     }
                 });
@@ -90,7 +92,7 @@ namespace APIV2.Controllers
         }
 
         //api/bettingGame
-        [HttpGet, Authorize(Roles = "Admin")]
+        [HttpGet, Authorize(Roles = "Admin, Internal")]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetBettingGames()
         {

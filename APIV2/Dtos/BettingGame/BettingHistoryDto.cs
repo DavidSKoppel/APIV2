@@ -10,7 +10,9 @@ namespace APIV2.Dtos.BettingGame
         public double? BettingAmount { get; set; }
 
         public int? BettingGameId { get; set; }
-        
+
+        public DateTime? CreatedTime { get; set; }
+
         public int? BettingCharacterId { get; set; }
 
         public bool? Outcome { get; set; }

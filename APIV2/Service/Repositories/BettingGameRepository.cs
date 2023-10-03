@@ -18,8 +18,6 @@ namespace APIV2.Service.Repositories
                 .Include(g => g.Game)
                 .ThenInclude(c => c.Characters)
                 .Include(b => b.BettingHistories)
-                //.Include(c => c.Address)
-                //.Include(s => s.Address.PostalCode)
                 .ToListAsync();
         }
     }
