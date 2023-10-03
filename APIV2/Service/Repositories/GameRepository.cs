@@ -16,8 +16,6 @@ namespace APIV2.Service.Repositories
         public async Task<ICollection<Game>> GetAllGames()
         {
             return await _context.Set<Game>()
-                //.Include(c => c.Address)
-                //.Include(s => s.Address.PostalCode)
                 .ToListAsync();
         }
 

@@ -23,6 +23,10 @@ namespace APIV2.Controllers
         public async Task<IActionResult> GetRandomGame()
         {
             var game = await _gameRepository.GetRandomGameWithCharacters();
+            if (game == null)
+            {
+                return StatusCode(500, ModelState);
+            }
             var characters = new List<CharacterDto>();
             foreach (var character in game.Characters)
             {
@@ -133,7 +137,7 @@ namespace APIV2.Controllers
         }
 
 
-        // DELETE: api/games/3
+        // DELETE: game/3
         [HttpDelete("{id}"), Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteGame(int id)
         {
