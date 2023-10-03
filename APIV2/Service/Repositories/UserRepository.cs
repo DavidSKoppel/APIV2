@@ -17,8 +17,6 @@ namespace APIV2.Service.Repositories
         public async Task<User> GetUserWithAllInfo(int userId)
         {
             return await _context.Users.Where(c => c.Id == userId)
-                //.Include(c => c.Address)
-                //.Include(s => s.Address.PostalCode)
                 .FirstOrDefaultAsync();
         }
 
@@ -53,8 +51,6 @@ namespace APIV2.Service.Repositories
         public async Task<ICollection<User>> GetUsersWithAllInfo()
         {
             return await _context.Set<User>()
-                //.Include(c => c.Address)
-                //.Include(s => s.Address.PostalCode)
                 .ToListAsync();
         }
 
@@ -101,8 +97,6 @@ namespace APIV2.Service.Repositories
         {
             return await _context.Set<User>()
                 .Include(c => c.Address)
-                //.Include(c => c.UserType)
-                //.Include(s => s.Address.PostalCode)
                 .Include(w => w.Wallets)
                 .ThenInclude(wallet => wallet.Transactions)
                 .ToListAsync();

@@ -116,7 +116,7 @@ namespace API.Controllers
             return Ok(user);
         }
 
-        [HttpGet("GetUsersWithAllHistory"), Authorize(Roles = "Admin")]
+        [HttpGet("GetUsersWithAllHistory"), Authorize(Roles = "Admin, Internal")]
         public async Task<IActionResult> GetUsersWithAllHistory()
         {
             var users = await _userRepository.GetUsersWithAllBettingHistory();
@@ -129,7 +129,7 @@ namespace API.Controllers
 
         }
 
-        [HttpGet("UserWalletAndTransactions"), Authorize(Roles = "Admin")]
+        [HttpGet("UserWalletAndTransactions"), Authorize(Roles = "Admin, Internal")]
         public async Task<IActionResult> GetUserWalletAndTrans()
         {
             var users = await _userRepository.GetUserWalletAndTrans();
@@ -151,9 +151,9 @@ namespace API.Controllers
             {
                 loginSuccess = await _userRepository.CheckIfUserExistByEmail(user.email, user.password);
             }
-            catch(Exception e) 
+            catch(Exception e)
             {
-                return BadRequest(e);
+                return StatusCode(404, "Username or password is wrong");
             }
             if (loginSuccess)
             {
@@ -182,7 +182,7 @@ namespace API.Controllers
                     return StatusCode(423, "User inactive");
                 }
             }
-            return BadRequest("is Bed");
+            return StatusCode(418, "is Bed");
         }
         
         private string CreateToken(string email, string userType)
@@ -228,8 +228,7 @@ namespace API.Controllers
         }
 
         //api/user
-        [HttpGet, Authorize(Roles = "Admin")]
-        [ProducesResponseType(400)]
+        [HttpGet, Authorize(Roles = "Admin, Internal")]
         public async Task<IActionResult> GetUsers()
         {
             var users = await _userRepository.GetAllAsync();
